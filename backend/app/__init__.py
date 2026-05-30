@@ -1,0 +1,33 @@
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from flask_jwt_extended import JWTManager
+from flask_cors import CORS
+from .config import Config
+
+db = SQLAlchemy()
+migrate = Migrate()
+jwt = JWTManager()
+
+
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(Config)
+
+    CORS(app, resources={r"/api/*": {"origins": ["http://localhost:5173", "http://127.0.0.1:5173"]}})
+
+    db.init_app(app)
+    migrate.init_app(app, db)
+    jwt.init_app(app)
+
+    from .routes.auth import auth_bp
+    from .routes.patients import patients_bp
+    from .routes.doctors import doctors_bp
+    from .routes.appointments import appointments_bp
+
+    app.register_blueprint(auth_bp, url_prefix='/api/auth')
+    app.register_blueprint(patients_bp, url_prefix='/api')
+    app.register_blueprint(doctors_bp, url_prefix='/api')
+    app.register_blueprint(appointments_bp, url_prefix='/api')
+
+    return app
