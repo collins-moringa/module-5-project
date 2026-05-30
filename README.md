@@ -22,16 +22,16 @@ A full-stack web application for managing hospital records, including patient re
 project M5/
 ├── backend/
 │   ├── app/
-│   │   ├── __init__.py        # Flask app factory
-│   │   ├── config.py          # Environment configuration
-│   │   ├── models.py          # SQLAlchemy models
+│   │   ├── __init__.py  
+│   │   ├── config.py 
+│   │   ├── models.py 
 │   │   └── routes/
-│   │       ├── auth.py        # Register, login, logout
-│   │       ├── patients.py    # Patient CRUD
-│   │       ├── doctors.py     # Doctor CRUD
-│   │       └── appointments.py # Appointment CRUD
-│   ├── run.py                 # Flask entry point
-│   ├── seed.py                # Database seed script
+│   │       ├── auth.py 
+│   │       ├── patients.py 
+│   │       ├── doctors.py 
+│   │       └── appointments.py
+│   ├── run.py 
+│   ├── seed.py 
 │   ├── requirements.txt
 │   └── .env
 │
@@ -41,7 +41,7 @@ project M5/
     │   │   ├── Navbar.jsx
     │   │   └── ProtectedRoute.jsx
     │   ├── context/
-    │   │   └── AuthContext.jsx    # JWT state management
+    │   │   └── AuthContext.jsx
     │   ├── pages/
     │   │   ├── Home.jsx
     │   │   ├── Login.jsx
@@ -54,8 +54,8 @@ project M5/
     │   │   ├── Appointments.jsx
     │   │   └── AppointmentForm.jsx
     │   ├── services/
-    │   │   └── api.js             # Axios API service
-    │   └── App.jsx                # Router setup
+    │   │   └── api.js 
+    │   └── App.jsx 
     ├── package.json
     └── vite.config.js
 ```
@@ -127,8 +127,8 @@ All endpoints under `/api` require a valid JWT token in the `Authorization: Bear
 ### 1. Clone the repository
 
 ```bash
-git clone <repo-url>
-cd "project M5"
+git clone https://github.com/collins-moringa/module-5-project
+cd "module-5-project"
 ```
 
 ---
@@ -156,7 +156,7 @@ This creates the SQLite database and populates it with sample Kenyan patients, d
 python run.py
 ```
 
-The API will be available at `http://localhost:5001`.
+The API will be available at `http://localhost:5001`. 
 
 ---
 
@@ -175,7 +175,7 @@ The app will be available at `http://localhost:5173`.
 ---
 
 ### 4. Login
-
+Seeded credential for demo, but you can go ahead and create an account
 | Username       | Password   |
 |----------------|------------|
 | admin          | admin123   |
