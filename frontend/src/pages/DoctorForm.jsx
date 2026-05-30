@@ -4,6 +4,14 @@ import { doctorsAPI } from '../services/api'
 
 const EMPTY = { name: '', specialization: '', contact: '', email: '' }
 
+const SPECIALIZATIONS = [
+  'Cardiology', 'Orthopedics', 'Pediatrics', 'General Practice',
+  'Neurology', 'Dermatology', 'Psychiatry', 'Oncology',
+  'Radiology', 'Surgery', 'Gynecology', 'Ophthalmology',
+  'ENT', 'Urology', 'Anesthesiology', 'Emergency Medicine',
+  'Internal Medicine', 'Obstetrics',
+]
+
 export default function DoctorForm() {
   const { id } = useParams()
   const isEdit = Boolean(id)
@@ -13,13 +21,6 @@ export default function DoctorForm() {
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(isEdit)
 
-  const SPECIALIZATIONS = [
-    'Cardiology', 'Orthopedics', 'Pediatrics', 'General Practice',
-    'Neurology', 'Dermatology', 'Psychiatry', 'Oncology',
-    'Radiology', 'Surgery', 'Gynecology', 'Ophthalmology',
-    'ENT', 'Urology', 'Anesthesiology', 'Emergency Medicine',
-  ]
-
   useEffect(() => {
     if (!isEdit) return
     doctorsAPI.getOne(id)
@@ -27,7 +28,7 @@ export default function DoctorForm() {
         const { name, specialization, contact, email } = res.data.doctor
         setForm({ name, specialization, contact, email: email || '' })
       })
-      .catch(() => setError('Failed to load doctor.'))
+      .catch(() => setError('Could not load doctor details.'))
       .finally(() => setFetching(false))
   }, [id, isEdit])
 
@@ -45,22 +46,24 @@ export default function DoctorForm() {
       }
       navigate('/doctors')
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to save doctor.')
+      setError(err.response?.data?.error || 'Failed to save. Please check your inputs.')
     } finally {
       setLoading(false)
     }
   }
 
-  if (fetching) return <div className="loading"><div className="spinner" /></div>
+  if (fetching) return <div className="loading"><div className="spinner" /><p>Loading doctor...</p></div>
 
   return (
-    <div style={{ maxWidth: 600 }}>
+    <div style={{ maxWidth: 620 }}>
       <div className="page-header">
         <div>
           <h1 className="page-title">{isEdit ? 'Edit Doctor' : 'Add Doctor'}</h1>
-          <p className="page-subtitle">{isEdit ? 'Update doctor information' : 'Register a new doctor in the system'}</p>
+          <p className="page-subtitle">
+            {isEdit ? "Update the doctor's information" : 'Register a new doctor in the system'}
+          </p>
         </div>
-        <Link to="/doctors" className="btn btn-ghost">← Back</Link>
+        <Link to="/doctors" className="btn btn-ghost">Back to Doctors</Link>
       </div>
 
       <div className="card">
@@ -72,7 +75,7 @@ export default function DoctorForm() {
               <label htmlFor="name">Full Name *</label>
               <input
                 id="name" name="name" type="text"
-                placeholder="e.g. Dr. John Kamau"
+                placeholder="e.g. Dr. Amina Odhiambo"
                 value={form.name} onChange={handleChange} required
               />
             </div>
@@ -80,7 +83,7 @@ export default function DoctorForm() {
             <div className="form-group">
               <label htmlFor="specialization">Specialization *</label>
               <select id="specialization" name="specialization" value={form.specialization} onChange={handleChange} required>
-                <option value="">Select specialization</option>
+                <option value="">Select a specialization</option>
                 {SPECIALIZATIONS.map((s) => (
                   <option key={s} value={s}>{s}</option>
                 ))}
@@ -89,18 +92,21 @@ export default function DoctorForm() {
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="contact">Contact / Phone *</label>
+                <label htmlFor="contact">Phone Number *</label>
                 <input
                   id="contact" name="contact" type="tel"
-                  placeholder="e.g. 0755678901"
+                  placeholder="e.g. 0722 333 444"
                   value={form.contact} onChange={handleChange} required
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="email">Email Address</label>
+                <label htmlFor="email">
+                  Hospital Email{' '}
+                  <span style={{ color: 'var(--gray-400)', fontWeight: 400 }}>(optional)</span>
+                </label>
                 <input
                   id="email" name="email" type="email"
-                  placeholder="doctor@hospital.com"
+                  placeholder="doctor@knh.go.ke"
                   value={form.email} onChange={handleChange}
                 />
               </div>

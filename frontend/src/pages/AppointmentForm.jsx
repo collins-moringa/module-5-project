@@ -20,20 +20,23 @@ export default function AppointmentForm() {
     const fetchDropdowns = Promise.all([patientsAPI.getAll(), doctorsAPI.getAll()])
 
     if (isEdit) {
-      Promise.all([
-        fetchDropdowns,
-        appointmentsAPI.getOne(id),
-      ]).then(([[pRes, dRes], aRes]) => {
-        setPatients(pRes.data.patients)
-        setDoctors(dRes.data.doctors)
-        const { patient_id, doctor_id, date, time, reason, status } = aRes.data.appointment
-        setForm({ patient_id: String(patient_id), doctor_id: String(doctor_id), date, time, reason, status })
-      }).catch(() => setError('Failed to load data.')).finally(() => setFetching(false))
+      Promise.all([fetchDropdowns, appointmentsAPI.getOne(id)])
+        .then(([[pRes, dRes], aRes]) => {
+          setPatients(pRes.data.patients)
+          setDoctors(dRes.data.doctors)
+          const { patient_id, doctor_id, date, time, reason, status } = aRes.data.appointment
+          setForm({ patient_id: String(patient_id), doctor_id: String(doctor_id), date, time, reason, status })
+        })
+        .catch(() => setError('Failed to load appointment data.'))
+        .finally(() => setFetching(false))
     } else {
-      fetchDropdowns.then(([pRes, dRes]) => {
-        setPatients(pRes.data.patients)
-        setDoctors(dRes.data.doctors)
-      }).catch(() => setError('Failed to load patients/doctors.')).finally(() => setFetching(false))
+      fetchDropdowns
+        .then(([pRes, dRes]) => {
+          setPatients(pRes.data.patients)
+          setDoctors(dRes.data.doctors)
+        })
+        .catch(() => setError('Failed to load patients and doctors. Make sure the server is running.'))
+        .finally(() => setFetching(false))
     }
   }, [id, isEdit])
 
@@ -58,16 +61,18 @@ export default function AppointmentForm() {
     }
   }
 
-  if (fetching) return <div className="loading"><div className="spinner" /></div>
+  if (fetching) return <div className="loading"><div className="spinner" /><p>Loading...</p></div>
 
   return (
-    <div style={{ maxWidth: 640 }}>
+    <div style={{ maxWidth: 660 }}>
       <div className="page-header">
         <div>
           <h1 className="page-title">{isEdit ? 'Edit Appointment' : 'Schedule Appointment'}</h1>
-          <p className="page-subtitle">{isEdit ? 'Modify appointment details' : 'Book a new appointment between a patient and doctor'}</p>
+          <p className="page-subtitle">
+            {isEdit ? 'Update appointment details below' : 'Book a new appointment between a patient and a doctor'}
+          </p>
         </div>
-        <Link to="/appointments" className="btn btn-ghost">← Back</Link>
+        <Link to="/appointments" className="btn btn-ghost">Back</Link>
       </div>
 
       <div className="card">
@@ -79,18 +84,22 @@ export default function AppointmentForm() {
               <div className="form-group">
                 <label htmlFor="patient_id">Patient *</label>
                 <select id="patient_id" name="patient_id" value={form.patient_id} onChange={handleChange} required>
-                  <option value="">Select patient</option>
+                  <option value="">Choose a patient</option>
                   {patients.map((p) => (
-                    <option key={p.id} value={p.id}>{p.name} (Age {p.age})</option>
+                    <option key={p.id} value={p.id}>
+                      {p.name} ({p.age} yrs, {p.gender})
+                    </option>
                   ))}
                 </select>
               </div>
               <div className="form-group">
                 <label htmlFor="doctor_id">Doctor *</label>
                 <select id="doctor_id" name="doctor_id" value={form.doctor_id} onChange={handleChange} required>
-                  <option value="">Select doctor</option>
+                  <option value="">Choose a doctor</option>
                   {doctors.map((d) => (
-                    <option key={d.id} value={d.id}>{d.name} — {d.specialization}</option>
+                    <option key={d.id} value={d.id}>
+                      {d.name} — {d.specialization}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -98,14 +107,14 @@ export default function AppointmentForm() {
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="date">Date *</label>
+                <label htmlFor="date">Appointment Date *</label>
                 <input
                   id="date" name="date" type="date"
                   value={form.date} onChange={handleChange} required
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="time">Time *</label>
+                <label htmlFor="time">Appointment Time *</label>
                 <input
                   id="time" name="time" type="time"
                   value={form.time} onChange={handleChange} required
@@ -117,7 +126,7 @@ export default function AppointmentForm() {
               <label htmlFor="reason">Reason for Visit *</label>
               <textarea
                 id="reason" name="reason"
-                placeholder="Describe the reason for this appointment..."
+                placeholder="Describe why the patient is visiting (e.g. chest pain, follow-up, routine checkup)..."
                 value={form.reason} onChange={handleChange} required
               />
             </div>

@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { appointmentsAPI } from '../services/api'
 
-const STATUS_OPTIONS = ['', 'scheduled', 'completed', 'cancelled']
-
 export default function Appointments() {
   const [appointments, setAppointments] = useState([])
   const [statusFilter, setStatusFilter] = useState('')
@@ -17,7 +15,7 @@ export default function Appointments() {
       const res = await appointmentsAPI.getAll(params)
       setAppointments(res.data.appointments)
     } catch {
-      setError('Failed to load appointments.')
+      setError('Could not load appointments. Is the server running?')
     } finally {
       setLoading(false)
     }
@@ -26,7 +24,7 @@ export default function Appointments() {
   useEffect(() => { fetchAppointments(statusFilter) }, [statusFilter])
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Cancel this appointment?')) return
+    if (!window.confirm('Cancel this appointment? This action cannot be undone.')) return
     try {
       await appointmentsAPI.delete(id)
       setAppointments((prev) => prev.filter((a) => a.id !== id))
@@ -39,49 +37,51 @@ export default function Appointments() {
     <span className={`badge badge-${status}`}>{status}</span>
   )
 
+  const filterBtns = [
+    { value: '', label: 'All' },
+    { value: 'scheduled', label: 'Scheduled' },
+    { value: 'completed', label: 'Completed' },
+    { value: 'cancelled', label: 'Cancelled' },
+  ]
+
   return (
     <div>
       <div className="page-header">
         <div>
           <h1 className="page-title">Appointments</h1>
-          <p className="page-subtitle">{appointments.length} appointment{appointments.length !== 1 ? 's' : ''}</p>
+          <p className="page-subtitle">
+            {appointments.length} appointment{appointments.length !== 1 ? 's' : ''}
+            {statusFilter ? ` — ${statusFilter}` : ''}
+          </p>
         </div>
-        <Link to="/appointments/new" className="btn btn-primary">+ Schedule Appointment</Link>
+        <Link to="/appointments/new" className="btn btn-primary">Schedule Appointment</Link>
       </div>
 
       {error && <div className="alert alert-error">{error}</div>}
 
       <div className="card">
         <div className="card-header">
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-            <label htmlFor="statusFilter" style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--gray-600)', marginBottom: 0 }}>
-              Filter by status:
-            </label>
-            <select
-              id="statusFilter"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              style={{ width: 'auto', padding: '6px 12px' }}
-            >
-              <option value="">All</option>
-              <option value="scheduled">Scheduled</option>
-              <option value="completed">Completed</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {filterBtns.map((f) => (
+              <button
+                key={f.value}
+                className={`btn btn-sm ${statusFilter === f.value ? 'btn-primary' : 'btn-ghost'}`}
+                onClick={() => setStatusFilter(f.value)}
+              >
+                {f.label}
+              </button>
+            ))}
           </div>
         </div>
 
         <div className="table-wrapper">
           {loading ? (
-            <div className="loading"><div className="spinner" /></div>
+            <div className="loading"><div className="spinner" /><p>Loading appointments...</p></div>
           ) : appointments.length === 0 ? (
             <div className="empty-state">
-              <div className="icon">📅</div>
-              <h3>No appointments found</h3>
-              <p>Schedule the first appointment to get started.</p>
-              <Link to="/appointments/new" className="btn btn-primary" style={{ marginTop: 12 }}>
-                Schedule Appointment
-              </Link>
+              <h3>{statusFilter ? `No ${statusFilter} appointments` : 'No appointments yet'}</h3>
+              <p>{statusFilter ? 'Try a different filter.' : 'Schedule the first appointment to get started.'}</p>
+              {!statusFilter && <Link to="/appointments/new" className="btn btn-primary">Schedule Now</Link>}
             </div>
           ) : (
             <table>
@@ -101,17 +101,13 @@ export default function Appointments() {
               <tbody>
                 {appointments.map((a) => (
                   <tr key={a.id}>
-                    <td style={{ color: 'var(--gray-400)' }}>{a.id}</td>
+                    <td style={{ color: 'var(--gray-400)', fontWeight: 600 }}>#{a.id}</td>
                     <td><strong>{a.patient_name}</strong></td>
-                    <td>{a.doctor_name}</td>
-                    <td>
-                      <span style={{ background: 'var(--primary-light)', color: 'var(--primary-dark)', padding: '2px 8px', borderRadius: 999, fontSize: '0.75rem', fontWeight: 500 }}>
-                        {a.doctor_specialization}
-                      </span>
-                    </td>
-                    <td>{a.date}</td>
-                    <td>{a.time}</td>
-                    <td style={{ maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <td style={{ color: 'var(--gray-600)' }}>{a.doctor_name}</td>
+                    <td><span className="specialty-pill">{a.doctor_specialization}</span></td>
+                    <td style={{ fontWeight: 600 }}>{a.date}</td>
+                    <td style={{ color: 'var(--gray-500)' }}>{a.time}</td>
+                    <td style={{ maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--gray-500)' }}>
                       {a.reason}
                     </td>
                     <td>{statusBadge(a.status)}</td>

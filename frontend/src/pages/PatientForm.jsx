@@ -20,7 +20,7 @@ export default function PatientForm() {
         const { name, age, gender, contact, email } = res.data.patient
         setForm({ name, age: String(age), gender, contact, email: email || '' })
       })
-      .catch(() => setError('Failed to load patient.'))
+      .catch(() => setError('Could not load patient details.'))
       .finally(() => setFetching(false))
   }, [id, isEdit])
 
@@ -38,22 +38,24 @@ export default function PatientForm() {
       }
       navigate('/patients')
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to save patient.')
+      setError(err.response?.data?.error || 'Failed to save. Please check your inputs.')
     } finally {
       setLoading(false)
     }
   }
 
-  if (fetching) return <div className="loading"><div className="spinner" /></div>
+  if (fetching) return <div className="loading"><div className="spinner" /><p>Loading patient...</p></div>
 
   return (
-    <div style={{ maxWidth: 600 }}>
+    <div style={{ maxWidth: 620 }}>
       <div className="page-header">
         <div>
           <h1 className="page-title">{isEdit ? 'Edit Patient' : 'Register Patient'}</h1>
-          <p className="page-subtitle">{isEdit ? 'Update patient details' : 'Add a new patient to the system'}</p>
+          <p className="page-subtitle">
+            {isEdit ? 'Update patient information below' : 'Fill in the details to register a new patient'}
+          </p>
         </div>
-        <Link to="/patients" className="btn btn-ghost">← Back</Link>
+        <Link to="/patients" className="btn btn-ghost">Back to Patients</Link>
       </div>
 
       <div className="card">
@@ -65,7 +67,7 @@ export default function PatientForm() {
               <label htmlFor="name">Full Name *</label>
               <input
                 id="name" name="name" type="text"
-                placeholder="Enter patient's full name"
+                placeholder="e.g. Wanjiku Kamau"
                 value={form.name} onChange={handleChange} required
               />
             </div>
@@ -85,25 +87,27 @@ export default function PatientForm() {
                   <option value="">Select gender</option>
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
-                  <option value="Other">Other</option>
                 </select>
               </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="contact">Contact / Phone *</label>
+                <label htmlFor="contact">Phone Number *</label>
                 <input
                   id="contact" name="contact" type="tel"
-                  placeholder="e.g. 0700123456"
+                  placeholder="e.g. 0712 345 678"
                   value={form.contact} onChange={handleChange} required
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="email">Email Address</label>
+                <label htmlFor="email">
+                  Email Address{' '}
+                  <span style={{ color: 'var(--gray-400)', fontWeight: 400 }}>(optional)</span>
+                </label>
                 <input
                   id="email" name="email" type="email"
-                  placeholder="patient@example.com"
+                  placeholder="patient@gmail.com"
                   value={form.email} onChange={handleChange}
                 />
               </div>

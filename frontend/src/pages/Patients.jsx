@@ -6,7 +6,6 @@ export default function Patients() {
   const [patients, setPatients] = useState([])
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
-  const [deleteId, setDeleteId] = useState(null)
   const [error, setError] = useState('')
 
   const fetchPatients = async (q = '') => {
@@ -15,7 +14,7 @@ export default function Patients() {
       const res = await patientsAPI.getAll(q)
       setPatients(res.data.patients)
     } catch {
-      setError('Failed to load patients.')
+      setError('Could not load patients. Is the server running?')
     } finally {
       setLoading(false)
     }
@@ -28,13 +27,13 @@ export default function Patients() {
     fetchPatients(search)
   }
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Remove this patient from the system?')) return
+  const handleDelete = async (id, name) => {
+    if (!window.confirm(`Remove ${name} from the system? This cannot be undone.`)) return
     try {
       await patientsAPI.delete(id)
       setPatients((prev) => prev.filter((p) => p.id !== id))
     } catch {
-      alert('Failed to delete patient.')
+      alert('Failed to delete patient. They may have linked appointments.')
     }
   }
 
@@ -43,19 +42,21 @@ export default function Patients() {
       <div className="page-header">
         <div>
           <h1 className="page-title">Patients</h1>
-          <p className="page-subtitle">{patients.length} registered patient{patients.length !== 1 ? 's' : ''}</p>
+          <p className="page-subtitle">
+            {patients.length} patient{patients.length !== 1 ? 's' : ''} registered in the system
+          </p>
         </div>
-        <Link to="/patients/new" className="btn btn-primary">+ Register Patient</Link>
+        <Link to="/patients/new" className="btn btn-primary">Register Patient</Link>
       </div>
 
       {error && <div className="alert alert-error">{error}</div>}
 
       <div className="card">
         <div className="card-header">
-          <form className="search-bar" onSubmit={handleSearch} style={{ margin: 0 }}>
+          <form className="search-bar" onSubmit={handleSearch}>
             <input
               type="text"
-              placeholder="Search by name..."
+              placeholder="Search by patient name..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -70,13 +71,12 @@ export default function Patients() {
 
         <div className="table-wrapper">
           {loading ? (
-            <div className="loading"><div className="spinner" /></div>
+            <div className="loading"><div className="spinner" /><p>Loading patients...</p></div>
           ) : patients.length === 0 ? (
             <div className="empty-state">
-              <div className="icon">👥</div>
-              <h3>No patients found</h3>
-              <p>Register the first patient to get started.</p>
-              <Link to="/patients/new" className="btn btn-primary" style={{ marginTop: 12 }}>Register Patient</Link>
+              <h3>{search ? 'No patients match your search' : 'No patients yet'}</h3>
+              <p>{search ? 'Try a different name.' : 'Register the first patient to get started.'}</p>
+              {!search && <Link to="/patients/new" className="btn btn-primary">Register First Patient</Link>}
             </div>
           ) : (
             <table>
@@ -95,19 +95,23 @@ export default function Patients() {
               <tbody>
                 {patients.map((p) => (
                   <tr key={p.id}>
-                    <td style={{ color: 'var(--gray-400)' }}>{p.id}</td>
-                    <td><strong>{p.name}</strong></td>
-                    <td>{p.age}</td>
+                    <td style={{ color: 'var(--gray-400)', fontWeight: 600 }}>#{p.id}</td>
+                    <td><strong style={{ color: 'var(--gray-900)' }}>{p.name}</strong></td>
+                    <td>{p.age} yrs</td>
                     <td>{p.gender}</td>
                     <td>{p.contact}</td>
-                    <td>{p.email || '—'}</td>
+                    <td style={{ color: 'var(--gray-500)' }}>{p.email || '—'}</td>
                     <td>
-                      <span className="badge badge-scheduled">{p.appointment_count}</span>
+                      <span className="badge badge-count">
+                        {p.appointment_count} appt{p.appointment_count !== 1 ? 's' : ''}
+                      </span>
                     </td>
                     <td>
                       <div className="table-actions">
                         <Link to={`/patients/${p.id}/edit`} className="btn btn-ghost btn-sm">Edit</Link>
-                        <button className="btn btn-danger btn-sm" onClick={() => handleDelete(p.id)}>Delete</button>
+                        <button className="btn btn-danger btn-sm" onClick={() => handleDelete(p.id, p.name)}>
+                          Delete
+                        </button>
                       </div>
                     </td>
                   </tr>

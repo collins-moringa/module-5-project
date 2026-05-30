@@ -7,17 +7,20 @@ export default function Home() {
   return (
     <div>
       <div className="hero">
+        <div className="hero-badge">Built for Kenyan Healthcare</div>
         <h1>
-          Smart Hospital Management<br />
-          <span>Powered by CareTrack</span>
+          Manage Hospital Records<br />
+          <span>The Easy Way</span>
         </h1>
         <p>
-          Streamline patient registration, doctor management, and appointment
-          scheduling in one unified platform built for modern healthcare.
+          CareTrack helps you register patients, manage doctors, and schedule
+          appointments — all in one simple place. No paperwork, no hassle.
         </p>
         <div className="hero-actions">
           {user ? (
-            <Link to="/dashboard" className="btn btn-primary btn-lg">Go to Dashboard →</Link>
+            <Link to="/dashboard" className="btn btn-primary btn-lg">
+              Go to Dashboard
+            </Link>
           ) : (
             <>
               <Link to="/register" className="btn btn-primary btn-lg">Get Started</Link>
@@ -29,24 +32,24 @@ export default function Home() {
 
       <div className="features-grid">
         <div className="feature-card">
-          <div className="feature-icon">👥</div>
-          <h3>Patient Management</h3>
-          <p>Register patients, track their records, and manage their full appointment history.</p>
+          <div className="feature-icon-box blue">P</div>
+          <h3>Patient Records</h3>
+          <p>Register and manage patient details with ease. Find anyone in seconds using search.</p>
         </div>
         <div className="feature-card">
-          <div className="feature-icon">🩺</div>
-          <h3>Doctor Directory</h3>
-          <p>Maintain a complete directory of doctors with their specializations and contact info.</p>
+          <div className="feature-icon-box teal">D</div>
+          <h3>Doctor Profiles</h3>
+          <p>Keep a full directory of doctors with their specializations and contact information.</p>
         </div>
         <div className="feature-card">
-          <div className="feature-icon">📅</div>
-          <h3>Appointment Scheduling</h3>
-          <p>Schedule, update, and cancel appointments with real-time status tracking.</p>
+          <div className="feature-icon-box amber">A</div>
+          <h3>Appointments</h3>
+          <p>Book, update, and cancel appointments. Track status from scheduled to completed.</p>
         </div>
         <div className="feature-card">
-          <div className="feature-icon">🔒</div>
+          <div className="feature-icon-box rose">S</div>
           <h3>Secure Access</h3>
-          <p>JWT-protected authentication ensures only authorized staff can access records.</p>
+          <p>Only authorized staff can access the system. Data stays safe with JWT authentication.</p>
         </div>
       </div>
     </div>

@@ -13,7 +13,7 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <NavLink to="/" className="navbar-brand">
-        🏥 <span>CareTrack</span>
+        CareTrack
       </NavLink>
 
       {user && (
@@ -34,8 +34,12 @@ export default function Navbar() {
           <div className="nav-divider" />
 
           <div className="nav-user">
-            <span className="nav-username">👤 {user.username}</span>
-            <button className="btn btn-ghost btn-sm" onClick={handleLogout}>
+            <span className="nav-username">{user.username}</span>
+            <button
+              className="btn btn-sm"
+              style={{ background: 'rgba(255,255,255,0.2)', color: '#fff', border: '1.5px solid rgba(255,255,255,0.3)' }}
+              onClick={handleLogout}
+            >
               Logout
             </button>
           </div>

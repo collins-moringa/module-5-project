@@ -14,7 +14,7 @@ export default function Doctors() {
       const res = await doctorsAPI.getAll(q)
       setDoctors(res.data.doctors)
     } catch {
-      setError('Failed to load doctors.')
+      setError('Could not load doctors. Is the server running?')
     } finally {
       setLoading(false)
     }
@@ -27,13 +27,13 @@ export default function Doctors() {
     fetchDoctors(search)
   }
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Remove this doctor from the system?')) return
+  const handleDelete = async (id, name) => {
+    if (!window.confirm(`Remove ${name} from the system? This cannot be undone.`)) return
     try {
       await doctorsAPI.delete(id)
       setDoctors((prev) => prev.filter((d) => d.id !== id))
     } catch {
-      alert('Failed to delete doctor.')
+      alert('Failed to remove doctor. They may have linked appointments.')
     }
   }
 
@@ -42,16 +42,18 @@ export default function Doctors() {
       <div className="page-header">
         <div>
           <h1 className="page-title">Doctors</h1>
-          <p className="page-subtitle">{doctors.length} registered doctor{doctors.length !== 1 ? 's' : ''}</p>
+          <p className="page-subtitle">
+            {doctors.length} doctor{doctors.length !== 1 ? 's' : ''} in the system
+          </p>
         </div>
-        <Link to="/doctors/new" className="btn btn-primary">+ Add Doctor</Link>
+        <Link to="/doctors/new" className="btn btn-primary">Add Doctor</Link>
       </div>
 
       {error && <div className="alert alert-error">{error}</div>}
 
       <div className="card">
         <div className="card-header">
-          <form className="search-bar" onSubmit={handleSearch} style={{ margin: 0 }}>
+          <form className="search-bar" onSubmit={handleSearch}>
             <input
               type="text"
               placeholder="Search by name or specialization..."
@@ -69,13 +71,12 @@ export default function Doctors() {
 
         <div className="table-wrapper">
           {loading ? (
-            <div className="loading"><div className="spinner" /></div>
+            <div className="loading"><div className="spinner" /><p>Loading doctors...</p></div>
           ) : doctors.length === 0 ? (
             <div className="empty-state">
-              <div className="icon">🩺</div>
-              <h3>No doctors found</h3>
-              <p>Add the first doctor to the system.</p>
-              <Link to="/doctors/new" className="btn btn-primary" style={{ marginTop: 12 }}>Add Doctor</Link>
+              <h3>{search ? 'No doctors match your search' : 'No doctors yet'}</h3>
+              <p>{search ? 'Try searching by name or specialization.' : 'Add the first doctor to get started.'}</p>
+              {!search && <Link to="/doctors/new" className="btn btn-primary">Add First Doctor</Link>}
             </div>
           ) : (
             <table>
@@ -93,20 +94,22 @@ export default function Doctors() {
               <tbody>
                 {doctors.map((d) => (
                   <tr key={d.id}>
-                    <td style={{ color: 'var(--gray-400)' }}>{d.id}</td>
-                    <td><strong>{d.name}</strong></td>
+                    <td style={{ color: 'var(--gray-400)', fontWeight: 600 }}>#{d.id}</td>
+                    <td><strong style={{ color: 'var(--gray-900)' }}>{d.name}</strong></td>
+                    <td><span className="specialty-pill">{d.specialization}</span></td>
+                    <td>{d.contact}</td>
+                    <td style={{ color: 'var(--gray-500)' }}>{d.email || '—'}</td>
                     <td>
-                      <span style={{ background: 'var(--primary-light)', color: 'var(--primary-dark)', padding: '2px 8px', borderRadius: 999, fontSize: '0.8rem', fontWeight: 500 }}>
-                        {d.specialization}
+                      <span className="badge badge-count">
+                        {d.appointment_count} appt{d.appointment_count !== 1 ? 's' : ''}
                       </span>
                     </td>
-                    <td>{d.contact}</td>
-                    <td>{d.email || '—'}</td>
-                    <td><span className="badge badge-scheduled">{d.appointment_count}</span></td>
                     <td>
                       <div className="table-actions">
                         <Link to={`/doctors/${d.id}/edit`} className="btn btn-ghost btn-sm">Edit</Link>
-                        <button className="btn btn-danger btn-sm" onClick={() => handleDelete(d.id)}>Delete</button>
+                        <button className="btn btn-danger btn-sm" onClick={() => handleDelete(d.id, d.name)}>
+                          Delete
+                        </button>
                       </div>
                     </td>
                   </tr>

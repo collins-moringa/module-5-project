@@ -31,12 +31,12 @@ export default function Login() {
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-logo">
-          <h1>🏥 CareTrack</h1>
+          <h1>CareTrack</h1>
           <p>Patient Appointment Management System</p>
         </div>
 
         <h2>Welcome back</h2>
-        <p>Sign in to access the hospital management system</p>
+        <p>Sign in to manage hospital records</p>
 
         {error && <div className="alert alert-error">{error}</div>}
 
@@ -67,18 +67,23 @@ export default function Login() {
             />
           </div>
 
-          <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading}>
+          <button
+            type="submit"
+            className="btn btn-primary"
+            style={{ width: '100%', justifyContent: 'center' }}
+            disabled={loading}
+          >
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
 
         <div className="auth-footer">
-          Don't have an account? <Link to="/register">Create one</Link>
+          New here? <Link to="/register">Create an account</Link>
         </div>
 
-        <div style={{ marginTop: 16, padding: 12, background: 'var(--gray-50)', borderRadius: 'var(--radius)', fontSize: '0.8rem', color: 'var(--gray-500)' }}>
+        <div className="demo-box">
           <strong>Demo credentials:</strong><br />
-          admin / admin123 &nbsp;|&nbsp; staff / staff123
+          admin / admin123 &nbsp;&nbsp;|&nbsp;&nbsp; nurse_wanjiku / nurse123
         </div>
       </div>
     </div>
