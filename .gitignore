@@ -2,3 +2,12 @@ __pycache__/
 *.pyc
 venv/*
 venv/
+# Dependencies
+frontend/node_modules/
+
+# Build output
+frontend/dist/
+
+# Environment variables
+.env
+.env.*
